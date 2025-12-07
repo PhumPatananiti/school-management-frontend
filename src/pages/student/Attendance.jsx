@@ -115,7 +115,19 @@ export default function StudentAttendance() {
 
   const formatTime = (timeString) => {
     if (!timeString) return "-";
-    return timeString.substring(0, 5); // Format HH:MM
+    
+    // Check if it's a full timestamp (ISO format with date and time)
+    if (timeString.includes('T') || timeString.includes(' ')) {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('th-TH', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+    }
+    
+    // If it's just time string (HH:MM:SS format)
+    return timeString.substring(0, 5); // Get HH:MM
   };
 
   const filteredRecords = attendanceRecords.filter(record => {

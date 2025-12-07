@@ -74,25 +74,25 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 px-4">
+    <div className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="inline-block p-4 bg-white rounded-full shadow-lg mb-4">
+        <div className="mb-8 text-center">
+          <div className="inline-block p-4 mb-4 bg-white rounded-full shadow-lg">
             <svg className="w-16 h-16 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">ระบบจัดการโรงเรียน</h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">ระบบจัดการโรงเรียน</h1>
           <p className="text-gray-600">เข้าสู่ระบบเพื่อใช้งาน</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="p-8 bg-white shadow-xl rounded-2xl">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start space-x-2">
+              <div className="flex items-start px-4 py-3 space-x-2 text-red-700 border border-red-200 rounded-lg bg-red-50">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
@@ -102,7 +102,7 @@ export default function Login({ onLogin }) {
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-semibold text-gray-700">
                 เลือกบทบาท
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -132,11 +132,11 @@ export default function Login({ onLogin }) {
 
             {/* Phone Input */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-semibold text-gray-700">
                 หมายเลขโทรศัพท์
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <div className="absolute text-gray-400 -translate-y-1/2 left-4 top-1/2">
                   <User size={20} />
                 </div>
                 <input
@@ -144,9 +144,9 @@ export default function Login({ onLogin }) {
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  placeholder="0812345678"
+                  placeholder="0000000000"
                   maxLength="10"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 transition-colors"
+                  className="w-full py-3 pl-12 pr-4 transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
                   disabled={loading}
                 />
               </div>
@@ -154,11 +154,11 @@ export default function Login({ onLogin }) {
 
             {/* Password Input */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-semibold text-gray-700">
                 รหัสผ่าน
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <div className="absolute text-gray-400 -translate-y-1/2 left-4 top-1/2">
                   <Lock size={20} />
                 </div>
                 <input
@@ -167,13 +167,13 @@ export default function Login({ onLogin }) {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 transition-colors"
+                  className="w-full py-3 pl-12 pr-12 transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute text-gray-400 -translate-y-1/2 right-4 top-1/2 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -192,7 +192,7 @@ export default function Login({ onLogin }) {
             >
               {loading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="w-5 h-5 border-b-2 border-white rounded-full animate-spin"></div>
                   <span>กำลังเข้าสู่ระบบ...</span>
                 </>
               ) : (
@@ -210,7 +210,7 @@ export default function Login({ onLogin }) {
               ยังไม่มีบัญชี?{' '}
               <Link
                 to="/register"
-                className="text-pink-500 hover:text-pink-600 font-semibold hover:underline"
+                className="font-semibold text-pink-500 hover:text-pink-600 hover:underline"
               >
                 สมัครสมาชิก
               </Link>
@@ -219,7 +219,7 @@ export default function Login({ onLogin }) {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
+        <div className="mt-6 text-sm text-center text-gray-500">
           <p>© 2024 ระบบจัดการโรงเรียน. All rights reserved.</p>
         </div>
       </div>

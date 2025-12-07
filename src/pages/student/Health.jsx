@@ -207,7 +207,7 @@ export default function Health() {
                       name="height"
                       value={healthData.height}
                       onChange={handleChange}
-                      placeholder="160"
+                      placeholder="ซม."
                       step="0.1"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
@@ -223,7 +223,7 @@ export default function Health() {
                       name="weight"
                       value={healthData.weight}
                       onChange={handleChange}
-                      placeholder="50"
+                      placeholder="กก."
                       step="0.1"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
@@ -336,7 +336,7 @@ export default function Health() {
                       name="emergency_contact_phone"
                       value={displayPhoneNumber(healthData.emergency_contact_phone)}
                       onChange={handleChange}
-                      placeholder="081-234-5678"
+                      placeholder="xxx-xxx-xxxx"
                       maxLength="12"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />

@@ -57,25 +57,25 @@ export default function Register({ onRegister }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 px-4">
+    <div className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-block p-4 bg-white rounded-full shadow-lg mb-4">
+        <div className="mb-8 text-center">
+          <div className="inline-block p-4 mb-4 bg-white rounded-full shadow-lg">
             <svg className="w-16 h-16 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">สมัครสมาชิก</h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">สมัครสมาชิก</h1>
           <p className="text-gray-600">ลงทะเบียนเพื่อเข้าใช้งานระบบ</p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="p-8 bg-white shadow-xl rounded-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start space-x-2">
+              <div className="flex items-start px-4 py-3 space-x-2 text-red-700 border border-red-200 rounded-lg bg-red-50">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
@@ -85,7 +85,7 @@ export default function Register({ onRegister }) {
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block mb-3 text-sm font-semibold text-gray-700">
                 คุณต้องการลงทะเบียนในฐานะ
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -116,14 +116,14 @@ export default function Register({ onRegister }) {
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
               <div className="flex items-start space-x-3">
                 <svg className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
                 <div className="text-sm text-blue-800">
-                  <p className="font-semibold mb-1">ข้อมูลสำคัญ:</p>
-                  <ul className="space-y-1 list-disc list-inside text-xs">
+                  <p className="mb-1 font-semibold">ข้อมูลสำคัญ:</p>
+                  <ul className="space-y-1 text-xs list-disc list-inside">
                     <li>ครูและนักเรียนต้องได้รับการเพิ่มข้อมูลโดยแอดมินก่อน</li>
                     <li>ใช้หมายเลขโทรศัพท์ที่แอดมินลงทะเบียนไว้ให้</li>
                     <li>OTP จะถูกส่งไปยังหมายเลขโทรศัพท์ที่กรอก</li>
@@ -134,11 +134,11 @@ export default function Register({ onRegister }) {
 
             {/* Phone Input */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block mb-2 text-sm font-semibold text-gray-700">
                 หมายเลขโทรศัพท์
               </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <div className="absolute text-gray-400 -translate-y-1/2 left-4 top-1/2">
                   <Phone size={20} />
                 </div>
                 <input
@@ -146,9 +146,9 @@ export default function Register({ onRegister }) {
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  placeholder="0812345678"
+                  placeholder="0000000000"
                   maxLength="10"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 transition-colors"
+                  className="w-full py-3 pl-12 pr-4 transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
                   disabled={loading}
                 />
               </div>
@@ -169,7 +169,7 @@ export default function Register({ onRegister }) {
             >
               {loading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="w-5 h-5 border-b-2 border-white rounded-full animate-spin"></div>
                   <span>กำลังส่ง OTP...</span>
                 </>
               ) : (
@@ -187,7 +187,7 @@ export default function Register({ onRegister }) {
               มีบัญชีอยู่แล้ว?{' '}
               <Link
                 to="/login"
-                className="text-pink-500 hover:text-pink-600 font-semibold hover:underline"
+                className="font-semibold text-pink-500 hover:text-pink-600 hover:underline"
               >
                 เข้าสู่ระบบ
               </Link>
@@ -196,7 +196,7 @@ export default function Register({ onRegister }) {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
+        <div className="mt-6 text-sm text-center text-gray-500">
           <p>© 2024 ระบบจัดการโรงเรียน. All rights reserved.</p>
         </div>
       </div>
