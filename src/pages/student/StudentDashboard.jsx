@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, CheckSquare, BookOpen, Heart, HomeIcon } from "lucide-react";
-import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import StudentLayout from "../../components/StudentLayout";
 import API from "../../services/api";
 
 export default function StudentDashboard() {
@@ -11,14 +9,6 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem("user"));
-
-  const menuItems = [
-    { path: "/student", icon: Home, label: "หน้าหลัก" },
-    { path: "/student/attendance", icon: CheckSquare, label: "การเข้าเรียน" },
-    { path: "/student/grades", icon: BookOpen, label: "ผลการเรียน" },
-    { path: "/student/health", icon: Heart, label: "ข้อมูลสุขภาพ" },
-    { path: "/student/homevisits", icon: HomeIcon, label: "การเยี่ยมบ้าน" },
-  ];
 
   useEffect(() => {
     fetchData();
@@ -102,93 +92,85 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={profile || user} onLogout={handleLogout} />
-      
-      <div className="flex">
-        <Sidebar items={menuItems} role="student" />
-        
-        <div className="flex-1 p-6">
-          <h2 className="mb-6 text-3xl font-bold">
-            ยินดีต้อนรับ {profile?.full_name || user?.full_name || "นักเรียน"}
-          </h2>
+    <StudentLayout user={profile || user} onLogout={handleLogout}>
+      <h2 className="mb-6 text-3xl font-bold">
+        ยินดีต้อนรับ {profile?.full_name || user?.full_name || "นักเรียน"}
+      </h2>
 
-          <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-3">
-            <div className="p-6 bg-white shadow-lg rounded-xl">
-              <h3 className="mb-2 font-semibold text-gray-600">การเข้าเรียน</h3>
-              <p className="text-4xl font-bold text-green-500">
-                {calculateAttendancePercentage()}%
-              </p>
+      <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-3">
+        <div className="p-6 bg-white shadow-lg rounded-xl">
+          <h3 className="mb-2 font-semibold text-gray-600">การเข้าเรียน</h3>
+          <p className="text-4xl font-bold text-green-500">
+            {calculateAttendancePercentage()}%
+          </p>
+        </div>
+
+        <div className="p-6 bg-white shadow-lg rounded-xl">
+          <h3 className="mb-2 font-semibold text-gray-600">คะแนนความประพฤติ</h3>
+          <p className="text-4xl font-bold text-blue-500">
+            {profile?.behavior_score || 100}
+          </p>
+          <p className="mt-1 text-sm text-gray-500">เต็ม 100 คะแนน</p>
+        </div>
+
+        <div className="p-6 bg-white shadow-lg rounded-xl">
+          <h3 className="mb-2 font-semibold text-gray-600">จำนวนวิชา</h3>
+          <p className="text-4xl font-bold text-purple-500">
+            {Array.isArray(grades) ? grades.length : 0}
+          </p>
+          <p className="mt-1 text-sm text-gray-500">วิชา</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="p-6 bg-white shadow-lg rounded-xl">
+          <h3 className="mb-4 text-xl font-bold">ข้อมูลส่วนตัว</h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-600">รหัสนักเรียน</p>
+              <p className="font-semibold">{profile?.student_id || "-"}</p>
             </div>
-
-            <div className="p-6 bg-white shadow-lg rounded-xl">
-              <h3 className="mb-2 font-semibold text-gray-600">คะแนนความประพฤติ</h3>
-              <p className="text-4xl font-bold text-blue-500">
-                {profile?.behavior_score || 100}
-              </p>
-              <p className="mt-1 text-sm text-gray-500">เต็ม 100 คะแนน</p>
+            <div>
+              <p className="text-sm text-gray-600">ห้อง</p>
+              <p className="font-semibold">{profile?.room_name || "-"}</p>
             </div>
-
-            <div className="p-6 bg-white shadow-lg rounded-xl">
-              <h3 className="mb-2 font-semibold text-gray-600">จำนวนวิชา</h3>
-              <p className="text-4xl font-bold text-purple-500">
-                {Array.isArray(grades) ? grades.length : 0}
-              </p>
-              <p className="mt-1 text-sm text-gray-500">วิชา</p>
+            <div>
+              <p className="text-sm text-gray-600">ครูที่ปรึกษา</p>
+              <p className="font-semibold">{profile?.homeroom_teacher_name || "-"}</p>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="p-6 bg-white shadow-lg rounded-xl">
-              <h3 className="mb-4 text-xl font-bold">ข้อมูลส่วนตัว</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-600">รหัสนักเรียน</p>
-                  <p className="font-semibold">{profile?.student_id || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">ห้อง</p>
-                  <p className="font-semibold">{profile?.room_name || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">ครูที่ปรึกษา</p>
-                  <p className="font-semibold">{profile?.homeroom_teacher_name || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">เบอร์โทร</p>
-                  <p className="font-semibold">{profile?.phone || "-"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 bg-white shadow-lg rounded-xl">
-              <h3 className="mb-4 text-xl font-bold">ผลการเรียนล่าสุด</h3>
-              {!grades || grades.length === 0 ? (
-                <div className="py-8 text-center text-gray-500">
-                  ยังไม่มีผลการเรียน
-                </div>
-              ) : (
-                <div className="space-y-2 overflow-y-auto max-h-64">
-                  {grades.slice(0, 5).map((grade, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                      <div>
-                        <p className="font-medium">{grade.subject_name || grade.subject_code}</p>
-                        <p className="text-xs text-gray-500">
-                          {grade.academic_year}/{grade.semester}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-purple-500">{grade.grade || "-"}</p>
-                        <p className="text-xs text-gray-500">{grade.gpa ? `${grade.gpa} GPA` : ""}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div>
+              <p className="text-sm text-gray-600">เบอร์โทร</p>
+              <p className="font-semibold">{profile?.phone || "-"}</p>
             </div>
           </div>
         </div>
+
+        <div className="p-6 bg-white shadow-lg rounded-xl">
+          <h3 className="mb-4 text-xl font-bold">ผลการเรียนล่าสุด</h3>
+          {!grades || grades.length === 0 ? (
+            <div className="py-8 text-center text-gray-500">
+              ยังไม่มีผลการเรียน
+            </div>
+          ) : (
+            <div className="space-y-2 overflow-y-auto max-h-64">
+              {grades.slice(0, 5).map((grade, index) => (
+                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                  <div>
+                    <p className="font-medium">{grade.subject_name || grade.subject_code}</p>
+                    <p className="text-xs text-gray-500">
+                      {grade.academic_year}/{grade.semester}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-purple-500">{grade.grade || "-"}</p>
+                    <p className="text-xs text-gray-500">{grade.gpa ? `${grade.gpa} GPA` : ""}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </StudentLayout>
   );
 }

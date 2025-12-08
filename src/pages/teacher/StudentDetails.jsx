@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
-  Home, Users, CheckSquare, BookOpen, HomeIcon, UserCircle, 
-  ArrowLeft, Calendar, Award, Heart, ClipboardList 
+  ArrowLeft, Calendar, Award, Heart, ClipboardList, UserCircle 
 } from "lucide-react";
-import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import TeacherLayout from "../../components/TeacherLayout";
 import API from "../../services/api";
 
 export default function StudentDetail({ user, onLogout }) {
@@ -36,14 +34,6 @@ export default function StudentDetail({ user, onLogout }) {
       return;
     }
   }, [studentId, navigate]);
-
-  const menuItems = [
-    { path: "/teacher", icon: Home, label: "หน้าหลัก" },
-    { path: "/teacher/attendance", icon: CheckSquare, label: "เช็คชื่อ" },
-    { path: "/teacher/grades", icon: BookOpen, label: "จัดการคะแนน" },
-    { path: "/teacher/homevisits", icon: HomeIcon, label: "เยี่ยมบ้าน" },
-    { path: "/teacher/studentinformation", icon: UserCircle, label: "ข้อมูลนักเรียน" },
-  ];
 
   useEffect(() => {
     fetchAllData();
@@ -95,104 +85,132 @@ export default function StudentDetail({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} onLogout={onLogout} />
-      
-      <div className="flex">
-        <Sidebar items={menuItems} role="teacher" />
-        
-        <div className="flex-1 p-6">
-          {/* Header */}
-          <div className="flex items-center mb-6 space-x-4">
-            <button
-              onClick={() => navigate("/teacher/studentinformation")}
-              className="flex items-center px-4 py-2 text-gray-700 transition-colors bg-white rounded-lg hover:bg-gray-100"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              กลับ
-            </button>
-            <h2 className="text-3xl font-bold">ข้อมูลนักเรียน</h2>
-          </div>
+    <TeacherLayout user={user} onLogout={onLogout}>
+      {/* Header */}
+      <div className="flex items-center mb-6 space-x-4">
+        <button
+          onClick={() => navigate("/teacher/studentinformation")}
+          className="flex items-center px-4 py-2 text-gray-700 transition-colors bg-white rounded-lg hover:bg-gray-100"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          กลับ
+        </button>
+        <h2 className="text-2xl font-bold sm:text-3xl">ข้อมูลนักเรียน</h2>
+      </div>
 
-          {/* Student Profile Card */}
-          <div className="p-6 mb-6 bg-white shadow-lg rounded-xl">
-            <div className="flex items-start space-x-6">
-              <div className="flex items-center justify-center w-24 h-24 text-3xl text-white bg-pink-500 rounded-full">
-                {studentProfile?.full_name?.charAt(0) || "?"}
+      {/* Student Profile Card */}
+      <div className="p-4 mb-6 bg-white shadow-lg sm:p-6 rounded-xl">
+        <div className="flex flex-col items-start space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+          <div className="flex items-center justify-center w-20 h-20 text-2xl text-white bg-pink-500 rounded-full sm:w-24 sm:h-24 sm:text-3xl">
+            {studentProfile?.full_name?.charAt(0) || "?"}
+          </div>
+          <div className="flex-1 w-full">
+            <h3 className="mb-3 text-xl font-bold sm:text-2xl sm:mb-2">{studentProfile?.full_name}</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm sm:gap-4 sm:grid-cols-4">
+              <div>
+                <p className="text-gray-500">เลขที่</p>
+                <p className="font-semibold">{studentProfile?.student_number}</p>
               </div>
-              <div className="flex-1">
-                <h3 className="mb-2 text-2xl font-bold">{studentProfile?.full_name}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500">เลขที่</p>
-                    <p className="font-semibold">{studentProfile?.student_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">รหัสนักเรียน</p>
-                    <p className="font-semibold">{studentProfile?.student_id}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">ห้องเรียน</p>
-                    <p className="font-semibold">{studentProfile?.room_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">คะแนนความประพฤติ</p>
-                    <p className="font-semibold text-pink-600">
-                      {studentProfile?.behavior_score || 100}
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <p className="text-gray-500">รหัสนักเรียน</p>
+                <p className="font-semibold">{studentProfile?.student_id}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">ห้องเรียน</p>
+                <p className="font-semibold">{studentProfile?.room_name}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">คะแนนความประพฤติ</p>
+                <p className="font-semibold text-pink-600">
+                  {studentProfile?.behavior_score || 100}
+                </p>
               </div>
             </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="mb-6">
-            <div className="flex space-x-2 overflow-x-auto">
-              <TabButton
-                active={activeTab === "profile"}
-                onClick={() => setActiveTab("profile")}
-                icon={<UserCircle className="w-5 h-5" />}
-                label="ข้อมูลส่วนตัว"
-              />
-              <TabButton
-                active={activeTab === "attendance"}
-                onClick={() => setActiveTab("attendance")}
-                icon={<Calendar className="w-5 h-5" />}
-                label="การเข้าเรียน"
-              />
-              <TabButton
-                active={activeTab === "grades"}
-                onClick={() => setActiveTab("grades")}
-                icon={<Award className="w-5 h-5" />}
-                label="ผลการเรียน"
-              />
-              <TabButton
-                active={activeTab === "health"}
-                onClick={() => setActiveTab("health")}
-                icon={<Heart className="w-5 h-5" />}
-                label="สุขภาพ"
-              />
-              <TabButton
-                active={activeTab === "homevisits"}
-                onClick={() => setActiveTab("homevisits")}
-                icon={<ClipboardList className="w-5 h-5" />}
-                label="การเยี่ยมบ้าน"
-              />
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <div className="bg-white shadow-lg rounded-xl">
-            {activeTab === "profile" && <ProfileTab data={studentProfile} />}
-            {activeTab === "attendance" && <AttendanceTab data={attendance} />}
-            {activeTab === "grades" && <GradesTab grades={grades} gpaData={gpaData} />}
-            {activeTab === "health" && <HealthTab data={health} />}
-            {activeTab === "homevisits" && <HomeVisitsTab data={homeVisits} />}
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Mobile-Friendly Tabs */}
+      <div className="mb-6">
+        {/* Desktop: Horizontal tabs */}
+        <div className="hidden space-x-2 sm:flex">
+          <TabButton
+            active={activeTab === "profile"}
+            onClick={() => setActiveTab("profile")}
+            icon={<UserCircle className="w-5 h-5" />}
+            label="ข้อมูลส่วนตัว"
+          />
+          <TabButton
+            active={activeTab === "attendance"}
+            onClick={() => setActiveTab("attendance")}
+            icon={<Calendar className="w-5 h-5" />}
+            label="การเข้าเรียน"
+          />
+          <TabButton
+            active={activeTab === "grades"}
+            onClick={() => setActiveTab("grades")}
+            icon={<Award className="w-5 h-5" />}
+            label="ผลการเรียน"
+          />
+          <TabButton
+            active={activeTab === "health"}
+            onClick={() => setActiveTab("health")}
+            icon={<Heart className="w-5 h-5" />}
+            label="สุขภาพ"
+          />
+          <TabButton
+            active={activeTab === "homevisits"}
+            onClick={() => setActiveTab("homevisits")}
+            icon={<ClipboardList className="w-5 h-5" />}
+            label="การเยี่ยมบ้าน"
+          />
+        </div>
+
+        {/* Mobile: Grid layout */}
+        <div className="grid grid-cols-2 gap-2 sm:hidden">
+          <MobileTabButton
+            active={activeTab === "profile"}
+            onClick={() => setActiveTab("profile")}
+            icon={<UserCircle className="w-6 h-6" />}
+            label="ข้อมูลส่วนตัว"
+          />
+          <MobileTabButton
+            active={activeTab === "attendance"}
+            onClick={() => setActiveTab("attendance")}
+            icon={<Calendar className="w-6 h-6" />}
+            label="การเข้าเรียน"
+          />
+          <MobileTabButton
+            active={activeTab === "grades"}
+            onClick={() => setActiveTab("grades")}
+            icon={<Award className="w-6 h-6" />}
+            label="ผลการเรียน"
+          />
+          <MobileTabButton
+            active={activeTab === "health"}
+            onClick={() => setActiveTab("health")}
+            icon={<Heart className="w-6 h-6" />}
+            label="สุขภาพ"
+          />
+          <MobileTabButton
+            active={activeTab === "homevisits"}
+            onClick={() => setActiveTab("homevisits")}
+            icon={<ClipboardList className="w-6 h-6" />}
+            label="การเยี่ยมบ้าน"
+            className="col-span-2"
+          />
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="bg-white shadow-lg rounded-xl">
+        {activeTab === "profile" && <ProfileTab data={studentProfile} />}
+        {activeTab === "attendance" && <AttendanceTab data={attendance} />}
+        {activeTab === "grades" && <GradesTab grades={grades} gpaData={gpaData} />}
+        {activeTab === "health" && <HealthTab data={health} />}
+        {activeTab === "homevisits" && <HomeVisitsTab data={homeVisits} />}
+      </div>
+    </TeacherLayout>
   );
 }
 
@@ -200,7 +218,7 @@ function TabButton({ active, onClick, icon, label }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all ${
+      className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
         active
           ? "bg-pink-500 text-white shadow-md"
           : "bg-white text-gray-700 hover:bg-gray-100"
@@ -212,11 +230,27 @@ function TabButton({ active, onClick, icon, label }) {
   );
 }
 
+function MobileTabButton({ active, onClick, icon, label, className = "" }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center justify-center p-4 rounded-xl font-medium transition-all ${
+        active
+          ? "bg-gradient-to-br from-pink-500 to-purple-500 text-white shadow-lg"
+          : "bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200"
+      } ${className}`}
+    >
+      <div className="mb-2">{icon}</div>
+      <span className="text-sm text-center">{label}</span>
+    </button>
+  );
+}
+
 function ProfileTab({ data }) {
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h3 className="mb-4 text-xl font-bold">ข้อมูลส่วนตัว</h3>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
         <InfoItem label="ชื่อ-นามสกุล" value={data?.full_name} />
         <InfoItem label="เลขที่" value={data?.student_number} />
         <InfoItem label="รหัสนักเรียน" value={data?.student_id} />
@@ -242,7 +276,7 @@ function AttendanceTab({ data }) {
     ((parseInt(data.present) + parseInt(data.late)) / total * 100).toFixed(1) : 0;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h3 className="mb-4 text-xl font-bold">สรุปการเข้าเรียน</h3>
       
       <div className="p-4 mb-6 rounded-lg bg-gradient-to-r from-pink-100 to-purple-100">
@@ -250,7 +284,7 @@ function AttendanceTab({ data }) {
         <p className="text-3xl font-bold text-pink-600">{attendanceRate}%</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">
         <StatCard label="มาเรียน" value={data?.present || 0} color="green" />
         <StatCard label="มาสาย" value={data?.late || 0} color="yellow" />
         <StatCard label="ลาป่วย" value={data?.sick_leave || 0} color="blue" />
@@ -263,11 +297,11 @@ function AttendanceTab({ data }) {
 
 function GradesTab({ grades, gpaData }) {
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h3 className="mb-4 text-xl font-bold">ผลการเรียน</h3>
       
       {gpaData && (
-        <div className="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 mb-6 sm:gap-4 md:grid-cols-4">
           <div className="p-4 rounded-lg bg-gradient-to-br from-pink-100 to-pink-50">
             <p className="text-sm text-gray-600">GPA</p>
             <p className="text-2xl font-bold text-pink-600">{gpaData.gpa}</p>
@@ -280,7 +314,7 @@ function GradesTab({ grades, gpaData }) {
             <p className="text-sm text-gray-600">คะแนนเฉลี่ย</p>
             <p className="text-2xl font-bold">{gpaData.average_score}</p>
           </div>
-          <div className="p-4 bg-gray-100 rounded-lg">
+          <div className="col-span-2 p-4 bg-gray-100 rounded-lg md:col-span-1">
             <p className="text-sm text-gray-600">การกระจายเกรด</p>
             <p className="text-sm">
               A: {gpaData.grade_distribution?.A || 0} | 
@@ -294,45 +328,47 @@ function GradesTab({ grades, gpaData }) {
       {grades.length === 0 ? (
         <div className="py-8 text-center text-gray-500">ยังไม่มีข้อมูลผลการเรียน</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-sm font-semibold text-left">วิชา</th>
-                <th className="px-4 py-3 text-sm font-semibold text-center">รหัสวิชา</th>
-                <th className="px-4 py-3 text-sm font-semibold text-center">คะแนนรวม</th>
-                <th className="px-4 py-3 text-sm font-semibold text-center">เกรด</th>
-                <th className="px-4 py-3 text-sm font-semibold text-left">ครูผู้สอน</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {grades.map((grade, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">{grade.subject_name}</td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600">
-                    {grade.subject_code}
-                  </td>
-                  <td className="px-4 py-3 font-semibold text-center">
-                    {grade.total_score}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      grade.grade === 'A' ? 'bg-green-100 text-green-700' :
-                      grade.grade === 'B' ? 'bg-blue-100 text-blue-700' :
-                      grade.grade === 'C' ? 'bg-yellow-100 text-yellow-700' :
-                      grade.grade === 'D' ? 'bg-orange-100 text-orange-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {grade.grade}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {grade.teacher_name || "-"}
-                  </td>
+        <div className="-mx-4 overflow-x-auto sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <table className="min-w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-xs font-semibold text-left sm:px-4 sm:text-sm">วิชา</th>
+                  <th className="px-3 py-3 text-xs font-semibold text-center sm:px-4 sm:text-sm">รหัสวิชา</th>
+                  <th className="px-3 py-3 text-xs font-semibold text-center sm:px-4 sm:text-sm">คะแนน</th>
+                  <th className="px-3 py-3 text-xs font-semibold text-center sm:px-4 sm:text-sm">เกรด</th>
+                  <th className="hidden px-4 py-3 text-sm font-semibold text-left sm:table-cell">ครูผู้สอน</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y">
+                {grades.map((grade, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 text-sm sm:px-4">{grade.subject_name}</td>
+                    <td className="px-3 py-3 text-xs text-center text-gray-600 sm:px-4 sm:text-sm">
+                      {grade.subject_code}
+                    </td>
+                    <td className="px-3 py-3 text-sm font-semibold text-center sm:px-4">
+                      {grade.total_score}
+                    </td>
+                    <td className="px-3 py-3 text-center sm:px-4">
+                      <span className={`px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold ${
+                        grade.grade === 'A' ? 'bg-green-100 text-green-700' :
+                        grade.grade === 'B' ? 'bg-blue-100 text-blue-700' :
+                        grade.grade === 'C' ? 'bg-yellow-100 text-yellow-700' :
+                        grade.grade === 'D' ? 'bg-orange-100 text-orange-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {grade.grade}
+                      </span>
+                    </td>
+                    <td className="hidden px-4 py-3 text-sm text-gray-600 sm:table-cell">
+                      {grade.teacher_name || "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
@@ -341,13 +377,13 @@ function GradesTab({ grades, gpaData }) {
 
 function HealthTab({ data }) {
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h3 className="mb-4 text-xl font-bold">ข้อมูลสุขภาพ</h3>
       
       {!data ? (
         <div className="py-8 text-center text-gray-500">ยังไม่มีข้อมูลสุขภาพ</div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
           <InfoItem label="กรุ๊ปเลือด" value={data.blood_type || "-"} />
           <InfoItem label="ส่วนสูง (ซม.)" value={data.height || "-"} />
           <InfoItem label="น้ำหนัก (กก.)" value={data.weight || "-"} />
@@ -356,7 +392,7 @@ function HealthTab({ data }) {
           <InfoItem label="ยาที่ใช้ประจำ" value={data.medications || "-"} />
           <InfoItem label="ผู้ติดต่อฉุกเฉิน" value={data.emergency_contact_name || "-"} />
           <InfoItem label="เบอร์ฉุกเฉิน" value={data.emergency_contact_phone || "-"} />
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <InfoItem label="หมายเหตุ" value={data.notes || "-"} />
           </div>
         </div>
@@ -382,7 +418,7 @@ function HomeVisitsTab({ data }) {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h3 className="mb-4 text-xl font-bold">ประวัติการเยี่ยมบ้าน</h3>
       
       {data.length === 0 ? (
@@ -393,8 +429,8 @@ function HomeVisitsTab({ data }) {
             <div key={index} className="overflow-hidden border border-gray-200 rounded-lg">
               {/* Header */}
               <div className="p-4 text-white bg-gradient-to-r from-pink-500 to-purple-500">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-bold">
+                <div className="flex flex-col items-start justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0">
+                  <h4 className="text-base font-bold sm:text-lg">
                     การเยี่ยมบ้านครั้งที่ {data.length - index}
                   </h4>
                   <span className="text-sm">
@@ -468,7 +504,7 @@ function HomeVisitsTab({ data }) {
                   <div className="pt-4 mt-4 border-t border-gray-200">
                     <p className="mb-2 text-sm text-gray-500">รายงานการเยี่ยม</p>
                     <div className="p-3 rounded-lg bg-gray-50">
-                      <p className="text-gray-700 whitespace-pre-wrap">{visit.notes}</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap sm:text-base">{visit.notes}</p>
                     </div>
                   </div>
                 )}
@@ -500,9 +536,9 @@ function StatCard({ label, value, color }) {
   };
 
   return (
-    <div className={`p-4 rounded-lg ${colorClasses[color]}`}>
-      <p className="text-sm font-medium">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
+    <div className={`p-3 sm:p-4 rounded-lg ${colorClasses[color]}`}>
+      <p className="text-xs font-medium sm:text-sm">{label}</p>
+      <p className="text-xl font-bold sm:text-2xl">{value}</p>
     </div>
   );
 }

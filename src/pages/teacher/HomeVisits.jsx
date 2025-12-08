@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Home, ClipboardList, BarChart3, MapPin, Calendar, FileText, Plus, Save, X, ExternalLink, Map as MapIcon, Link as LinkIcon, UserCircle } from "lucide-react";
-import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import { ClipboardList, Calendar, FileText, Plus, Save, X, ExternalLink, MapIcon, LinkIcon, MapPin } from "lucide-react";
+import TeacherLayout from "../../components/TeacherLayout";
 import API from "../../services/api";
 
 export default function HomeVisits() {
@@ -23,14 +22,6 @@ export default function HomeVisits() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
-
-  const menuItems = [
-    { path: "/teacher", icon: Home, label: "หน้าหลัก" },
-    { path: "/teacher/attendance", icon: ClipboardList, label: "เช็คชื่อ" },
-    { path: "/teacher/grades", icon: BarChart3, label: "บันทึกคะแนน" },
-    { path: "/teacher/homevisits", icon: MapIcon, label: "เยี่ยมบ้าน" },
-    { path: "/teacher/studentinformation", icon: UserCircle, label: "ข้อมูลนักเรียน" },
-  ];
 
   const handleLogout = () => {
     localStorage.clear();
@@ -60,7 +51,6 @@ export default function HomeVisits() {
     setSelectedRoom(room);
     setSelectedStudent(null);
     setHomeVisits([]);
-    
     try {
       const res = await API.getRoomStudents(room.id, token);
       setStudents(res.data.data);
@@ -95,7 +85,6 @@ export default function HomeVisits() {
   // Extract coordinates from Google Maps URL
   const extractCoordinatesFromUrl = (url) => {
     if (!url) return { latitude: null, longitude: null };
-    
     try {
       // Pattern 1: ?q=lat,lng (most common from share button)
       const qPattern = /[?&]q=(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/;
@@ -155,7 +144,6 @@ export default function HomeVisits() {
           const lat = position.coords.latitude.toFixed(6);
           const lng = position.coords.longitude.toFixed(6);
           const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-          
           setFormData(prev => ({
             ...prev,
             maps_url: mapsUrl
@@ -196,18 +184,16 @@ export default function HomeVisits() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!selectedStudent) {
       alert("กรุณาเลือกนักเรียน");
       return;
     }
 
     setLoading(true);
-
     try {
       // Extract coordinates from URL for database storage
       const coords = extractCoordinatesFromUrl(formData.maps_url);
-      
+
       const res = await API.createHomeVisit({
         student_id: selectedStudent.id,
         visit_date: formData.visit_date,
@@ -248,160 +234,198 @@ export default function HomeVisits() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} onLogout={handleLogout} />
-      
-      <div className="flex">
-        <Sidebar items={menuItems} role="teacher" />
-        
-        <div className="flex-1 p-6">
-          <h2 className="mb-6 text-2xl font-bold text-gray-800">การเยี่ยมบ้าน</h2>
+    <TeacherLayout user={user} onLogout={handleLogout}>
+      <h2 className="mb-6 text-2xl font-bold text-gray-800">การเยี่ยมบ้าน</h2>
 
-          {/* Room Selection */}
-          <div className="p-4 mb-6 bg-white rounded-lg shadow">
-            <label className="block mb-2 font-semibold text-gray-700">เลือกห้องเรียน</label>
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              {rooms.map(room => (
-                <button
-                  key={room.id}
-                  onClick={() => handleRoomSelect(room)}
-                  className={`p-3 rounded-lg font-medium transition-all ${
-                    selectedRoom?.id === room.id
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {room.name}
-                </button>
-              ))}
+      {/* Room Selection */}
+      <div className="p-4 mb-6 bg-white rounded-lg shadow">
+        <label className="block mb-2 font-semibold text-gray-700">เลือกห้องเรียน</label>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          {rooms.map(room => (
+            <button
+              key={room.id}
+              onClick={() => handleRoomSelect(room)}
+              className={`p-3 rounded-lg font-medium transition-all ${
+                selectedRoom?.id === room.id
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              {room.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Student List */}
+      {selectedRoom && students.length > 0 && (
+        <div className="p-4 mb-6 bg-white rounded-lg shadow">
+          <label className="block mb-2 font-semibold text-gray-700">เลือกนักเรียน</label>
+          <div className="grid grid-cols-2 gap-2 overflow-y-auto md:grid-cols-3 lg:grid-cols-4 max-h-96">
+            {students.map(student => (
+              <button
+                key={student.id}
+                onClick={() => handleStudentSelect(student)}
+                className={`p-3 rounded-lg font-medium transition-all text-left ${
+                  selectedStudent?.id === student.id
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                <div className="text-sm font-bold">เลขที่ {student.student_number}</div>
+                <div className="text-xs truncate">{student.full_name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Selected Student Info & Actions */}
+      {selectedStudent && (
+        <div className="p-6 mb-6 bg-white rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-gray-800">
+                {selectedStudent.full_name}
+              </h3>
+              <p className="text-gray-600">
+                เลขที่ {selectedStudent.student_number} | รหัส {selectedStudent.student_id}
+              </p>
             </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 px-4 py-2 text-white transition-all rounded-lg shadow-lg bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+            >
+              <Plus className="w-5 h-5" />
+              บันทึกการเยี่ยมบ้าน
+            </button>
           </div>
 
-          {/* Student List */}
-          {selectedRoom && students.length > 0 && (
-            <div className="p-4 mb-6 bg-white rounded-lg shadow">
-              <label className="block mb-2 font-semibold text-gray-700">เลือกนักเรียน</label>
-              <div className="grid grid-cols-2 gap-2 overflow-y-auto md:grid-cols-3 lg:grid-cols-4 max-h-96">
-                {students.map(student => (
-                  <button
-                    key={student.id}
-                    onClick={() => handleStudentSelect(student)}
-                    className={`p-3 rounded-lg font-medium transition-all text-left ${
-                      selectedStudent?.id === student.id
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                    }`}
-                  >
-                    <div className="text-sm font-bold">เลขที่ {student.student_number}</div>
-                    <div className="text-xs truncate">{student.full_name}</div>
-                  </button>
-                ))}
+          {/* Home Visit History */}
+          <div className="mt-6">
+            <h4 className="mb-3 font-semibold text-gray-800">ประวัติการเยี่ยมบ้าน</h4>
+            {homeVisits.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">
+                <MapIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>ยังไม่มีการเยี่ยมบ้านนักเรียนคนนี้</p>
               </div>
-            </div>
-          )}
-
-          {/* Selected Student Info & Actions */}
-          {selectedStudent && (
-            <div className="p-6 mb-6 bg-white rounded-lg shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800">
-                    {selectedStudent.full_name}
-                  </h3>
-                  <p className="text-gray-600">
-                    เลขที่ {selectedStudent.student_number} | รหัส {selectedStudent.student_id}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 text-white transition-all rounded-lg shadow-lg bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-                >
-                  <Plus className="w-5 h-5" />
-                  บันทึกการเยี่ยมบ้าน
-                </button>
-              </div>
-
-              {/* Home Visit History */}
-              <div className="mt-6">
-                <h4 className="mb-3 font-semibold text-gray-800">ประวัติการเยี่ยมบ้าน</h4>
-                {homeVisits.length === 0 ? (
-                  <div className="py-8 text-center text-gray-500">
-                    <MapIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>ยังไม่มีการเยี่ยมบ้านนักเรียนคนนี้</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {homeVisits.map((visit, index) => (
-                      <div key={visit.id} className="p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-blue-500" />
-                            <span className="font-semibold text-gray-800">
-                              ครั้งที่ {homeVisits.length - index} - {formatDate(visit.visit_date)}
-                            </span>
+            ) : (
+              <div className="space-y-4">
+                {homeVisits.map((visit, index) => {
+                  const coords = extractCoordinatesFromUrl(visit.maps_url);
+                  
+                  return (
+                    <div key={visit.id} className="overflow-hidden border border-gray-200 rounded-lg">
+                      {/* Header */}
+                      <div className="flex items-start justify-between p-4 text-white bg-gradient-to-r from-pink-500 to-purple-500">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-5 h-5" />
+                          <span className="font-semibold">
+                            ครั้งที่ {homeVisits.length - index} - {formatDate(visit.visit_date)}
+                          </span>
+                        </div>
+                        {visit.maps_url && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleShowMapFromUrl(visit.maps_url)}
+                              className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-all bg-white rounded-lg bg-opacity-20 hover:bg-opacity-30"
+                            >
+                              <MapIcon className="w-4 h-4" />
+                              ดูแผนที่
+                            </button>
+                            <a
+                              href={visit.maps_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-all bg-white rounded-lg bg-opacity-20 hover:bg-opacity-30"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              เปิดใน Google Maps
+                            </a>
                           </div>
-                          {visit.maps_url && (
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleShowMapFromUrl(visit.maps_url)}
-                                className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
-                              >
-                                <MapIcon className="w-4 h-4" />
-                                ดูแผนที่
-                              </button>
+                        )}
+                      </div>
+
+                      <div className="p-4">
+                        {/* Map Section */}
+                        {coords.latitude && coords.longitude ? (
+                          <div className="mb-4">
+                            <div className="relative h-64 mb-2 overflow-hidden bg-gray-100 border-2 border-gray-200 rounded-lg">
+                              <iframe
+                                width="100%"
+                                height="100%"
+                                frameBorder="0"
+                                style={{ border: 0 }}
+                                src={`https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                                allowFullScreen
+                                title={`Home location ${index}`}
+                              ></iframe>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              พิกัด: {coords.latitude}, {coords.longitude}
+                            </p>
+                          </div>
+                        ) : visit.maps_url ? (
+                          <div className="flex items-center justify-center h-64 mb-4 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg">
+                            <div className="text-center">
+                              <MapIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                              <p className="text-sm text-gray-600">ไม่สามารถแสดงแผนที่ได้</p>
                               <a
                                 href={visit.maps_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 transition-all rounded-lg bg-blue-50 hover:bg-blue-100"
+                                className="inline-flex items-center gap-2 mt-2 text-sm text-blue-600 hover:text-blue-800"
                               >
                                 <ExternalLink className="w-4 h-4" />
-                                เปิดใน Google Maps
+                                เปิดลิงก์ในแท็บใหม่
                               </a>
                             </div>
-                          )}
-                        </div>
-                        
+                          </div>
+                        ) : null}
+
+                        {/* Notes Section */}
                         {visit.notes && (
-                          <div className="p-3 mt-2 rounded-lg bg-gray-50">
+                          <div className="p-3 mb-3 rounded-lg bg-gray-50">
+                            <p className="mb-1 text-xs font-semibold text-gray-500">รายงานการเยี่ยม:</p>
                             <p className="text-sm text-gray-700 whitespace-pre-wrap">{visit.notes}</p>
                           </div>
                         )}
-                        
+
+                        {/* PDF Link */}
                         {visit.report_pdf && (
                           <a
                             href={visit.report_pdf}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 mt-2 text-sm text-red-600 hover:text-red-800"
+                            className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-800"
                           >
                             <FileText className="w-4 h-4" />
                             ดูเอกสาร PDF
                           </a>
                         )}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          )}
-
-          {/* Instructions */}
-          {!selectedRoom && (
-            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-              <h4 className="mb-2 font-semibold text-blue-900">วิธีใช้งาน:</h4>
-              <ol className="space-y-1 text-sm text-blue-800 list-decimal list-inside">
-                <li>เลือกห้องเรียนที่ต้องการ</li>
-                <li>เลือกนักเรียนที่ต้องการบันทึกการเยี่ยมบ้าน</li>
-                <li>กดปุ่ม "บันทึกการเยี่ยมบ้าน"</li>
-                <li>วางลิงก์ Google Maps ของที่อยู่บ้าน หรือใช้ตำแหน่งปัจจุบัน</li>
-                <li>กรอกหมายเหตุและกด "บันทึก"</li>
-              </ol>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Instructions */}
+      {!selectedRoom && (
+        <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
+          <h4 className="mb-2 font-semibold text-blue-900">วิธีใช้งาน:</h4>
+          <ol className="space-y-1 text-sm text-blue-800 list-decimal list-inside">
+            <li>เลือกห้องเรียนที่ต้องการ</li>
+            <li>เลือกนักเรียนที่ต้องการบันทึกการเยี่ยมบ้าน</li>
+            <li>กดปุ่ม "บันทึกการเยี่ยมบ้าน"</li>
+            <li>วางลิงก์ Google Maps ของที่อยู่บ้าน หรือใช้ตำแหน่งปัจจุบัน</li>
+            <li>กรอกหมายเหตุและกด "บันทึก"</li>
+          </ol>
+        </div>
+      )}
 
       {/* Modal for Creating Home Visit */}
       {showModal && (
@@ -448,7 +472,6 @@ export default function HomeVisits() {
                     ลิงก์ Google Maps ของที่อยู่บ้าน
                   </div>
                 </label>
-                
                 <button
                   type="button"
                   onClick={handleGetCurrentLocation}
@@ -458,7 +481,6 @@ export default function HomeVisits() {
                   <MapPin className="w-4 h-4" />
                   {loading ? 'กำลังดึงตำแหน่ง...' : 'ใช้ตำแหน่งปัจจุบัน'}
                 </button>
-
                 <input
                   type="url"
                   name="maps_url"
@@ -467,7 +489,6 @@ export default function HomeVisits() {
                   placeholder="https://maps.google.com/?q=13.7563,100.5018"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 />
-                
                 <div className="p-3 mt-2 rounded-lg bg-blue-50">
                   <p className="text-xs text-blue-800">
                     <strong>วิธีรับลิงก์ Google Maps:</strong>
@@ -539,10 +560,10 @@ export default function HomeVisits() {
         </div>
       )}
 
-      {/* Map Modal - EMBEDDED GOOGLE MAP IS HERE */}
+      {/* Map Modal - USING EXACT SAME METHOD AS StudentDetail.jsx */}
       {showMapModal && selectedLocation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 text-white bg-gradient-to-r from-blue-500 to-purple-500">
               <h3 className="text-xl font-bold">ตำแหน่งที่อยู่บ้าน</h3>
               <button
@@ -552,8 +573,8 @@ export default function HomeVisits() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            
-            <div className="p-4">
+
+            <div className="flex-1 p-4">
               {selectedLocation.latitude && selectedLocation.longitude && (
                 <div className="mb-3">
                   <p className="text-sm text-gray-600">
@@ -561,7 +582,7 @@ export default function HomeVisits() {
                   </p>
                 </div>
               )}
-              
+
               <div className="mb-3">
                 <a
                   href={selectedLocation.mapsUrl || `https://www.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}`}
@@ -573,40 +594,42 @@ export default function HomeVisits() {
                   เปิดใน Google Maps (แท็บใหม่)
                 </a>
               </div>
-              
-              {/* 🗺️ THIS IS THE EMBEDDED GOOGLE MAP */}
-              <div className="relative overflow-hidden rounded-lg" style={{ paddingBottom: '56.25%', height: 0 }}>
-                {selectedLocation.latitude && selectedLocation.longitude ? (
+
+              {/* 🗺️ EMBEDDED GOOGLE MAP - EXACT SAME AS StudentDetail.jsx */}
+              {selectedLocation.latitude && selectedLocation.longitude ? (
+                <div className="relative mb-2 overflow-hidden bg-gray-100 border-2 border-gray-200 rounded-lg h-96">
                   <iframe
-                    src={`https://maps.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}&output=embed&z=15`}
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src={`https://maps.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                     allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Google Map"
+                    title="Home location map"
                   ></iframe>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <div className="text-center">
-                      <MapIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-600">ไม่สามารถแสดงแผนที่ได้</p>
-                      <a
-                        href={selectedLocation.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-2 text-sm text-blue-600 hover:text-blue-800"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        เปิดลิงก์ในแท็บใหม่
-                      </a>
-                    </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg h-96">
+                  <div className="text-center">
+                    <MapIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-600">ไม่สามารถแสดงแผนที่ได้</p>
+                    <p className="mt-1 text-xs text-gray-500">ไม่พบพิกัดในลิงก์ที่ให้มา</p>
+                    <a
+                      href={selectedLocation.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 mt-3 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      เปิดลิงก์ในแท็บใหม่
+                    </a>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </TeacherLayout>
   );
 }

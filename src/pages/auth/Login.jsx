@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, LogIn, User, Lock, UserCog } from "lucide-react";
+import AuthLayout from "../../components/AuthLayout";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -74,155 +75,134 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
-      <div className="w-full max-w-md">
-        {/* Logo/Header */}
-        <div className="mb-8 text-center">
-          <div className="inline-block p-4 mb-4 bg-white rounded-full shadow-lg">
-            <svg className="w-16 h-16 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    <AuthLayout title="ระบบจัดการโรงเรียน" subtitle="เข้าสู่ระบบเพื่อใช้งาน">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+        {/* Error Message */}
+        {error && (
+          <div className="flex items-start px-3 py-2 space-x-2 text-red-700 border border-red-200 rounded-lg sm:px-4 sm:py-3 bg-red-50">
+            <svg className="w-4 h-4 mt-0.5 flex-shrink-0 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
+            <span className="text-xs sm:text-sm">{error}</span>
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-800">ระบบจัดการโรงเรียน</h1>
-          <p className="text-gray-600">เข้าสู่ระบบเพื่อใช้งาน</p>
-        </div>
+        )}
 
-        {/* Login Form */}
-        <div className="p-8 bg-white shadow-xl rounded-2xl">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-start px-4 py-3 space-x-2 text-red-700 border border-red-200 rounded-lg bg-red-50">
-                <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span className="text-sm">{error}</span>
-              </div>
-            )}
-
-            {/* Role Selection */}
-            <div>
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
-                เลือกบทบาท
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {['admin', 'teacher', 'student'].map((role) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => setForm({ ...form, role })}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      form.role === role
-                        ? 'border-pink-500 bg-pink-50 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      {role === 'admin' && <UserCog size={24} className="text-purple-500" />}
-                      {role === 'teacher' && <User size={24} className="text-blue-500" />}
-                      {role === 'student' && <User size={24} className="text-pink-500" />}
-                      <span className="text-xs font-medium">
-                        {role === 'admin' ? 'แอดมิน' : role === 'teacher' ? 'ครู' : 'นักเรียน'}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Phone Input */}
-            <div>
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
-                หมายเลขโทรศัพท์
-              </label>
-              <div className="relative">
-                <div className="absolute text-gray-400 -translate-y-1/2 left-4 top-1/2">
-                  <User size={20} />
-                </div>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="0000000000"
-                  maxLength="10"
-                  className="w-full py-3 pl-12 pr-4 transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
-                รหัสผ่าน
-              </label>
-              <div className="relative">
-                <div className="absolute text-gray-400 -translate-y-1/2 left-4 top-1/2">
-                  <Lock size={20} />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full py-3 pl-12 pr-12 transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute text-gray-400 -translate-y-1/2 right-4 top-1/2 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading || !form.role}
-              className={`w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center space-x-2 ${
-                loading || !form.role
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 shadow-lg hover:shadow-xl'
-              }`}
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-b-2 border-white rounded-full animate-spin"></div>
-                  <span>กำลังเข้าสู่ระบบ...</span>
-                </>
-              ) : (
-                <>
-                  <LogIn size={20} />
-                  <span>เข้าสู่ระบบ</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Register Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              ยังไม่มีบัญชี?{' '}
-              <Link
-                to="/register"
-                className="font-semibold text-pink-500 hover:text-pink-600 hover:underline"
+        {/* Role Selection */}
+        <div>
+          <label className="block mb-2 text-xs font-semibold text-gray-700 sm:text-sm">
+            เลือกบทบาท
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {['admin', 'teacher', 'student'].map((role) => (
+              <button
+                key={role}
+                type="button"
+                onClick={() => setForm({ ...form, role })}
+                className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
+                  form.role === role
+                    ? 'border-pink-500 bg-pink-50 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
               >
-                สมัครสมาชิก
-              </Link>
-            </p>
+                <div className="flex flex-col items-center space-y-1 sm:space-y-2">
+                  {role === 'admin' && <UserCog size={20} className="text-purple-500 sm:w-6 sm:h-6" />}
+                  {role === 'teacher' && <User size={20} className="text-blue-500 sm:w-6 sm:h-6" />}
+                  {role === 'student' && <User size={20} className="text-pink-500 sm:w-6 sm:h-6" />}
+                  <span className="text-xs font-medium">
+                    {role === 'admin' ? 'แอดมิน' : role === 'teacher' ? 'ครู' : 'นักเรียน'}
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-sm text-center text-gray-500">
-          <p>© 2024 ระบบจัดการโรงเรียน. All rights reserved.</p>
+        {/* Phone Input */}
+        <div>
+          <label className="block mb-2 text-xs font-semibold text-gray-700 sm:text-sm">
+            หมายเลขโทรศัพท์
+          </label>
+          <div className="relative">
+            <div className="absolute text-gray-400 -translate-y-1/2 left-3 top-1/2 sm:left-4">
+              <User size={18} className="sm:w-5 sm:h-5" />
+            </div>
+            <input
+              type="tel"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="0000000000"
+              maxLength="10"
+              className="w-full py-2.5 sm:py-3 pl-10 sm:pl-12 pr-3 sm:pr-4 text-sm sm:text-base transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
+              disabled={loading}
+            />
+          </div>
         </div>
+
+        {/* Password Input */}
+        <div>
+          <label className="block mb-2 text-xs font-semibold text-gray-700 sm:text-sm">
+            รหัสผ่าน
+          </label>
+          <div className="relative">
+            <div className="absolute text-gray-400 -translate-y-1/2 left-3 top-1/2 sm:left-4">
+              <Lock size={18} className="sm:w-5 sm:h-5" />
+            </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="w-full py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base transition-colors border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 sm:right-4 hover:text-gray-600"
+            >
+              {showPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading || !form.role}
+          className={`w-full py-2.5 sm:py-3 rounded-xl font-semibold text-white text-sm sm:text-base transition-all flex items-center justify-center space-x-2 ${
+            loading || !form.role
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 shadow-lg hover:shadow-xl'
+          }`}
+        >
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-b-2 border-white rounded-full sm:w-5 sm:h-5 animate-spin"></div>
+              <span>กำลังเข้าสู่ระบบ...</span>
+            </>
+          ) : (
+            <>
+              <LogIn size={18} className="sm:w-5 sm:h-5" />
+              <span>เข้าสู่ระบบ</span>
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Register Link */}
+      <div className="mt-5 text-center sm:mt-6">
+        <p className="text-xs text-gray-600 sm:text-sm">
+          ยังไม่มีบัญชี?{' '}
+          <Link
+            to="/register"
+            className="font-semibold text-pink-500 hover:text-pink-600 hover:underline"
+          >
+            สมัครสมาชิก
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
