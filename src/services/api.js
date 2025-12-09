@@ -96,6 +96,29 @@ const API = {
   // Teacher - Students
   getRoomStudents: (roomId) => api.get(`/teacher/rooms/${roomId}/students`),
   getStudentDetails: (studentId) => api.get(`/teacher/students/${studentId}`),
+  
+  // Teacher - Update Student Photo
+  updateStudentPhoto: (studentId, formData) => {
+    return new Promise((resolve, reject) => {
+      const file = formData.get('profile_picture');
+      const reader = new FileReader();
+      
+      reader.onloadend = async () => {
+        try {
+          const base64String = reader.result;
+          const response = await api.put(`/teacher/students/${studentId}/photo`, {
+            profile_picture: base64String
+          });
+          resolve(response);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  },
 
   // Teacher - Attendance
   takeHomeroomAttendance: (data) => api.post('/teacher/attendance/homeroom', data),
